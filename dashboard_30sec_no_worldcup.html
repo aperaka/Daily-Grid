@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="broadsheet">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Daily Grid — News Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --radius: 3px;
+    --font-display: 'Big Shoulders Display', sans-serif;
+    --font-body: 'Source Serif 4', serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  /* ---------- THEME: BROADSHEET (default) ---------- */
+  html[data-theme="broadsheet"]{
+    --bg: #EFEAE0;
+    --bg-alt: #E4DDCE;
+    --card-bg: #F7F4EC;
+    --text: #1C1A16;
+    --text-muted: #6B6355;
+    --border: #C9BFA9;
+    --accent: #A32E23;
+    --accent-ink: #FFFFFF;
+    --masthead-bg: #1C1A16;
+    --masthead-text: #EFEAE0;
+    --cat-sports: #A32E23;
+    --cat-technology: #2C5D63;
+    --cat-national: #4A3B78;
+    --cat-international: #8A6D1F;
+    --cat-stocks: #1F5C3F;
+    --cat-worldcup: #0F6B3C;
+    --shadow: 0 1px 0 rgba(28,26,22,0.08);
+  }
+
+  /* ---------- THEME: MIDNIGHT WIRE ---------- */
+  html[data-theme="midnight"]{
+    --bg: #0B1220;
+    --bg-alt: #0F1A2E;
+    --card-bg: #121D33;
+    --text: #E8ECF4;
+    --text-muted: #8593AD;
+    --border: #223252;
+    --accent: #F2A93B;
+    --accent-ink: #0B1220;
+    --masthead-bg: #060A13;
+    --masthead-text: #E8ECF4;
+    --cat-sports: #E8674B;
+    --cat-technology: #3FB8D8;
+    --cat-national: #9C7CF2;
+    --cat-international: #4FCF8C;
+    --cat-stocks: #F2A93B;
+    --cat-worldcup: #2FD17A;
+    --shadow: 0 1px 0 rgba(0,0,0,0.4);
+  }
+
+  /* ---------- THEME: TERMINAL ---------- */
+  html[data-theme="terminal"]{
+    --bg: #04100A;
+    --bg-alt: #071A10;
+    --card-bg: #06170F;
+    --text: #A9F5C6;
+    --text-muted: #4E8A67;
+    --border: #144228;
+    --accent: #39FF88;
+    --accent-ink: #04100A;
+    --masthead-bg: #010A05;
+    --masthead-text: #39FF88;
+    --cat-sports: #39FF88;
+    --cat-technology: #5CE1E6;
+    --cat-national: #C9FF5C;
+    --cat-international: #7CFFB2;
+    --cat-stocks: #FFE156;
+    --cat-worldcup: #6FFFB0;
+    --shadow: 0 0 0 rgba(0,0,0,0);
+    --font-body: 'JetBrains Mono', monospace;
+  }
+
+  /* ---------- THEME: SUNDAY PASTEL ---------- */
+  html[data-theme="pastel"]{
+    --bg: #F3EEF7;
+    --bg-alt: #ECE3F4;
+    --card-bg: #FFFFFF;
+    --text: #372A4D;
+    --text-muted: #8577A0;
+    --border: #DCCFEC;
+    --accent: #2F8F7A;
+    --accent-ink: #FFFFFF;
+    --masthead-bg: #372A4D;
+    --masthead-text: #F3EEF7;
+    --cat-sports: #E0637B;
+    --cat-technology: #3D8FD1;
+    --cat-national: #8A5FD1;
+    --cat-international: #2F8F7A;
+    --cat-stocks: #D19A3D;
+    --cat-worldcup: #1F8F5C;
+    --shadow: 0 1px 0 rgba(55,42,77,0.06);
+  }
+
+  *{ box-sizing: border-box; }
+  html, body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    transition: background .25s ease, color .25s ease;
+  }
+
+  a{ color: inherit; }
+
+  /* ---------- MASTHEAD ---------- */
+  .masthead{
+    background: var(--masthead-bg);
+    color: var(--masthead-text);
+    padding: 22px 28px 18px;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    border-bottom: 3px solid var(--accent);
+  }
+  .masthead-title{
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 44px;
+    letter-spacing: 0.5px;
+    line-height: 0.9;
+    text-transform: uppercase;
+  }
+  .masthead-sub{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    opacity: 0.65;
+    margin-top: 6px;
+  }
+  .masthead-right{
+    display:flex;
+    align-items:center;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  .masthead-date{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    opacity: 0.7;
+    letter-spacing: 0.5px;
+  }
+  .theme-picker{
+    display:flex;
+    gap: 8px;
+    align-items:center;
+  }
+  .lang-select{
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.3px;
+    background: transparent;
+    color: var(--masthead-text);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 999px;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+  .lang-select option{
+    background: var(--card-bg);
+    color: var(--text);
+  }
+  .theme-swatch{
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    position: relative;
+    transition: transform .15s ease, border-color .15s ease;
+  }
+  .theme-swatch:hover{ transform: scale(1.12); }
+  .theme-swatch.active{ border-color: currentColor; }
+  .theme-swatch.active::after{
+    content:'';
+    position:absolute; inset:-5px;
+    border:1px solid currentColor;
+    border-radius:50%;
+    opacity:0.5;
+  }
+  .sw-broadsheet{ background: linear-gradient(135deg,#EFEAE0 50%, #A32E23 50%); }
+  .sw-midnight{ background: linear-gradient(135deg,#0B1220 50%, #F2A93B 50%); }
+  .sw-terminal{ background: linear-gradient(135deg,#04100A 50%, #39FF88 50%); }
+  .sw-pastel{ background: linear-gradient(135deg,#F3EEF7 50%, #2F8F7A 50%); }
+
+  /* ---------- TICKER ---------- */
+  .ticker-wrap{
+    background: var(--bg-alt);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+  }
+  .ticker-track{
+    display: inline-flex;
+    gap: 40px;
+    padding: 9px 0;
+    animation: scroll-left 38s linear infinite;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+  }
+  .ticker-wrap:hover .ticker-track{ animation-play-state: paused; }
+  @keyframes scroll-left{
+    from{ transform: translateX(0); }
+    to{ transform: translateX(-50%); }
+  }
+  .tick{ display:inline-flex; align-items:center; gap:6px; color: var(--text-muted); }
+  .tick b{ color: var(--text); font-weight:600; }
+  .tick.up{ color: var(--cat-stocks); }
+  .tick.down{ color: var(--cat-sports); }
+
+  /* ---------- CATEGORY TABS ---------- */
+  .tabs{
+    display:flex;
+    gap: 10px;
+    padding: 18px 28px 6px;
+    flex-wrap: wrap;
+  }
+  .tab{
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  .tab:hover{ border-color: var(--accent); color: var(--text); }
+  .tab.active{
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-color: var(--accent);
+  }
+  .tab .count{ opacity:0.6; margin-left: 4px; }
+
+  /* ---------- GRID ---------- */
+  .grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 18px;
+    padding: 18px 28px 60px;
+  }
+  .card{
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: transform .15s ease, border-color .15s ease;
+    display:flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .card:hover{
+    transform: translateY(-3px);
+    border-color: var(--accent);
+  }
+  .card-top{ display:flex; justify-content:space-between; align-items:center; }
+  .cat-chip{
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 999px;
+    color: #fff;
+    font-weight: 600;
+  }
+  .card-time{
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--text-muted);
+  }
+  .card h3{
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 1.08;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.2px;
+  }
+  .card p{
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .card-byline{
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--text-muted);
+    opacity: 0.75;
+    margin-top: auto;
+  }
+
+  /* ---------- DETAIL PANEL ---------- */
+  .scrim{
+    position: fixed; inset:0;
+    background: rgba(0,0,0,0.45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease;
+    z-index: 40;
+  }
+  .scrim.open{ opacity:1; pointer-events:auto; }
+
+  .panel{
+    position: fixed;
+    top:0; right:0;
+    height: 100%;
+    width: min(460px, 92vw);
+    background: var(--card-bg);
+    border-left: 1px solid var(--border);
+    transform: translateX(100%);
+    transition: transform .25s ease;
+    z-index: 41;
+    display:flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .panel.open{ transform: translateX(0); }
+  .panel-head{
+    padding: 20px 22px 0;
+    display:flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .panel-close{
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    width: 30px; height: 30px;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1;
+    flex-shrink:0;
+  }
+  .panel-close:hover{ border-color: var(--accent); color: var(--accent); }
+  .panel-body{ padding: 14px 24px 40px; }
+  .panel-body h2{
+    font-family: var(--font-display);
+    font-size: 32px;
+    line-height: 1.02;
+    text-transform: uppercase;
+    margin: 12px 0 10px;
+  }
+  .panel-meta{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    display:flex;
+    gap: 14px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .panel-body p{
+    font-size: 15.5px;
+    line-height: 1.7;
+    color: var(--text);
+    margin: 0 0 14px;
+  }
+  .panel-body p.lede{
+    font-weight: 500;
+  }
+
+  #panelLink{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.3px;
+    color: var(--accent);
+    text-decoration: none;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 8px 14px;
+    width: fit-content;
+  }
+  #panelLink:hover{ border-color: var(--accent); }
+
+  .empty{
+    padding: 60px 28px;
+    text-align:center;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 0.5px;
+  }
+
+  @media (max-width: 560px){
+    .masthead-title{ font-size: 32px; }
+    .masthead{ padding: 16px 18px; }
+    .tabs, .grid{ padding-left: 18px; padding-right: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div>
+    <div class="masthead-title">The Daily Grid</div>
+    <div class="masthead-sub" id="mastheadTagline">Sports · Technology · National · International · Stocks</div>
+    <div class="masthead-sub"><a href="https://discerning-spirit-production-8fac.up.railway.app/" target="_blank" rel="noopener" style="color:inherit; opacity:1; text-decoration:underline; text-underline-offset:3px;">One Touch Fantasy ↗</a></div>
+  </div>
+  <div class="masthead-right">
+    <div class="masthead-date" id="todayDate"></div>
+    <select class="lang-select" id="langSelect" aria-label="Language"></select>
+    <div class="theme-picker" id="themePicker">
+      <div class="theme-swatch sw-broadsheet" data-theme="broadsheet" title="Broadsheet"></div>
+      <div class="theme-swatch sw-midnight" data-theme="midnight" title="Midnight Wire"></div>
+      <div class="theme-swatch sw-terminal" data-theme="terminal" title="Terminal"></div>
+      <div class="theme-swatch sw-pastel" data-theme="pastel" title="Sunday Pastel"></div>
+    </div>
+  </div>
+</header>
+
+<div class="ticker-wrap">
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
+
+<nav class="tabs" id="tabs"></nav>
+
+<main class="grid" id="grid"></main>
+
+<div class="scrim" id="scrim"></div>
+<aside class="panel" id="panel">
+  <div class="panel-head">
+    <span class="cat-chip" id="panelChip"></span>
+    <button class="panel-close" id="panelClose">&#10005;</button>
+  </div>
+  <div class="panel-body">
+    <h2 id="panelTitle"></h2>
+    <div class="panel-meta">
+      <span id="panelByline"></span>
+      <span id="panelTime"></span>
+      <span id="panelRead"></span>
+    </div>
+    <div id="panelText"></div>
+    <a id="panelLink" href="#" target="_blank" rel="noopener" style="display:none;"></a>
+  </div>
+</aside>
+
+<script>
+  const CATEGORIES = [
+    { id: 'sports', label: 'Sports' },
+    { id: 'technology', label: 'Technology' },
+    { id: 'national', label: 'National' },
+    { id: 'international', label: 'International' },
+    { id: 'stocks', label: 'Stocks' },
+  ];
+
+  // ---------- LANGUAGE SUPPORT ----------
+  const LANG_META = {
+    en: { native: 'English',    locale: 'en-US', rtl: false },
+    es: { native: 'Español',    locale: 'es-ES', rtl: false },
+    fr: { native: 'Français',   locale: 'fr-FR', rtl: false },
+    de: { native: 'Deutsch',    locale: 'de-DE', rtl: false },
+    it: { native: 'Italiano',   locale: 'it-IT', rtl: false },
+    pt: { native: 'Português',  locale: 'pt-PT', rtl: false },
+    nl: { native: 'Nederlands', locale: 'nl-NL', rtl: false },
+    sv: { native: 'Svenska',    locale: 'sv-SE', rtl: false },
+    da: { native: 'Dansk',      locale: 'da-DK', rtl: false },
+    no: { native: 'Norsk',      locale: 'nb-NO', rtl: false },
+    fi: { native: 'Suomi',      locale: 'fi-FI', rtl: false },
+    pl: { native: 'Polski',     locale: 'pl-PL', rtl: false },
+    cs: { native: 'Čeština',    locale: 'cs-CZ', rtl: false },
+    ro: { native: 'Română',     locale: 'ro-RO', rtl: false },
+    el: { native: 'Ελληνικά',   locale: 'el-GR', rtl: false },
+    ru: { native: 'Русский',    locale: 'ru-RU', rtl: false },
+    uk: { native: 'Українська', locale: 'uk-UA', rtl: false },
+    tr: { native: 'Türkçe',     locale: 'tr-TR', rtl: false },
+    ar: { native: 'العربية',    locale: 'ar-SA', rtl: true  },
+    he: { native: 'עברית',      locale: 'he-IL', rtl: true  },
+    hi: { native: 'हिन्दी',      locale: 'hi-IN', rtl: false },
+    th: { native: 'ไทย',        locale: 'th-TH', rtl: false },
+    vi: { native: 'Tiếng Việt', locale: 'vi-VN', rtl: false },
+    id: { native: 'Bahasa Indonesia', locale: 'id-ID', rtl: false },
+    ja: { native: '日本語',      locale: 'ja-JP', rtl: false },
+    ko: { native: '한국어',      locale: 'ko-KR', rtl: false },
+    'zh-CN': { native: '简体中文', locale: 'zh-CN', rtl: false },
+    'zh-TW': { native: '繁體中文', locale: 'zh-TW', rtl: false },
+  };
+
+  const I18N = {
+    en: { sports:'Sports', technology:'Technology', national:'National', international:'International', stocks:'Stocks', worldcup:'World Cup', all:'All', by:'By', empty:'No stories in this category yet.', fotmobMasthead:'Live World Cup scores & table on FotMob \u2197', fotmobPanel:'Live scores, table & fixtures on FotMob \u2197' },
+    es: { sports:'Deportes', technology:'Tecnología', national:'Nacional', international:'Internacional', stocks:'Bolsa', worldcup:'Mundial', all:'Todo', by:'Por', empty:'Todavía no hay noticias en esta categoría.', fotmobMasthead:'Resultados y tabla del Mundial en vivo en FotMob \u2197', fotmobPanel:'Resultados, tabla y calendario en vivo en FotMob \u2197' },
+    fr: { sports:'Sport', technology:'Technologie', national:'National', international:'International', stocks:'Bourse', worldcup:'Coupe du Monde', all:'Tout', by:'Par', empty:'Aucun article dans cette catégorie pour le moment.', fotmobMasthead:'Scores et classement en direct de la Coupe du Monde sur FotMob \u2197', fotmobPanel:'Scores, classement et calendrier en direct sur FotMob \u2197' },
+    de: { sports:'Sport', technology:'Technologie', national:'National', international:'International', stocks:'Börse', worldcup:'Weltmeisterschaft', all:'Alle', by:'Von', empty:'Noch keine Artikel in dieser Kategorie.', fotmobMasthead:'Live-Ergebnisse & Tabelle der WM auf FotMob \u2197', fotmobPanel:'Live-Ergebnisse, Tabelle & Spielplan auf FotMob \u2197' },
+    it: { sports:'Sport', technology:'Tecnologia', national:'Nazionale', international:'Internazionale', stocks:'Borsa', worldcup:'Mondiali', all:'Tutti', by:'Di', empty:'Nessun articolo in questa categoria per ora.', fotmobMasthead:'Risultati e classifica dei Mondiali in diretta su FotMob \u2197', fotmobPanel:'Risultati, classifica e calendario in diretta su FotMob \u2197' },
+    pt: { sports:'Esportes', technology:'Tecnologia', national:'Nacional', international:'Internacional', stocks:'Bolsa', worldcup:'Copa do Mundo', all:'Todos', by:'Por', empty:'Ainda não há matérias nesta categoria.', fotmobMasthead:'Resultados e tabela da Copa do Mundo ao vivo no FotMob \u2197', fotmobPanel:'Resultados, tabela e jogos ao vivo no FotMob \u2197' },
+    nl: { sports:'Sport', technology:'Technologie', national:'Nationaal', international:'Internationaal', stocks:'Beurs', worldcup:'WK', all:'Alle', by:'Door', empty:'Nog geen artikelen in deze categorie.', fotmobMasthead:'Live WK-uitslagen & stand op FotMob \u2197', fotmobPanel:'Live uitslagen, stand & programma op FotMob \u2197' },
+    sv: { sports:'Sport', technology:'Teknik', national:'Inrikes', international:'Utrikes', stocks:'Börs', worldcup:'VM', all:'Alla', by:'Av', empty:'Inga artiklar i denna kategori än.', fotmobMasthead:'Live VM-resultat & tabell på FotMob \u2197', fotmobPanel:'Live resultat, tabell & matcher på FotMob \u2197' },
+    da: { sports:'Sport', technology:'Teknologi', national:'Indland', international:'Udland', stocks:'Aktier', worldcup:'VM', all:'Alle', by:'Af', empty:'Ingen artikler i denne kategori endnu.', fotmobMasthead:'Live VM-resultater & tabel på FotMob \u2197', fotmobPanel:'Live resultater, tabel & kampe på FotMob \u2197' },
+    no: { sports:'Sport', technology:'Teknologi', national:'Innenriks', international:'Utenriks', stocks:'Børs', worldcup:'VM', all:'Alle', by:'Av', empty:'Ingen artikler i denne kategorien ennå.', fotmobMasthead:'Live VM-resultater & tabell på FotMob \u2197', fotmobPanel:'Live resultater, tabell & kamper på FotMob \u2197' },
+    fi: { sports:'Urheilu', technology:'Teknologia', national:'Kotimaa', international:'Ulkomaat', stocks:'Pörssi', worldcup:'MM-kisat', all:'Kaikki', by:'Kirjoittanut', empty:'Ei vielä artikkeleita tässä kategoriassa.', fotmobMasthead:'MM-kisojen tulokset ja sarjataulukko suorana FotMobissa \u2197', fotmobPanel:'Tulokset, sarjataulukko ja ottelut suorana FotMobissa \u2197' },
+    pl: { sports:'Sport', technology:'Technologia', national:'Krajowe', international:'Zagraniczne', stocks:'Giełda', worldcup:'Mistrzostwa Świata', all:'Wszystkie', by:'Autor', empty:'Brak artykułów w tej kategorii.', fotmobMasthead:'Wyniki i tabela MŚ na żywo na FotMob \u2197', fotmobPanel:'Wyniki, tabela i terminarz na żywo na FotMob \u2197' },
+    cs: { sports:'Sport', technology:'Technologie', national:'Domácí', international:'Zahraniční', stocks:'Burza', worldcup:'Mistrovství světa', all:'Vše', by:'Autor', empty:'V této kategorii zatím nejsou žádné články.', fotmobMasthead:'Živé výsledky a tabulka MS na FotMob \u2197', fotmobPanel:'Živé výsledky, tabulka a program na FotMob \u2197' },
+    ro: { sports:'Sport', technology:'Tehnologie', national:'Național', international:'Internațional', stocks:'Bursă', worldcup:'Campionatul Mondial', all:'Toate', by:'De', empty:'Încă nu există articole în această categorie.', fotmobMasthead:'Rezultate și clasament live ale Campionatului Mondial pe FotMob \u2197', fotmobPanel:'Rezultate, clasament și program live pe FotMob \u2197' },
+    el: { sports:'Αθλητικά', technology:'Τεχνολογία', national:'Εσωτερικά', international:'Διεθνή', stocks:'Χρηματιστήριο', worldcup:'Παγκόσμιο Κύπελλο', all:'Όλα', by:'Από', empty:'Δεν υπάρχουν ακόμη άρθρα σε αυτή την κατηγορία.', fotmobMasthead:'Ζωντανά αποτελέσματα & βαθμολογία Παγκοσμίου Κυπέλλου στο FotMob \u2197', fotmobPanel:'Ζωντανά αποτελέσματα, βαθμολογία & πρόγραμμα στο FotMob \u2197' },
+    ru: { sports:'Спорт', technology:'Технологии', national:'Внутренние новости', international:'Международные', stocks:'Биржа', worldcup:'Чемпионат мира', all:'Все', by:'Автор', empty:'В этой категории пока нет статей.', fotmobMasthead:'Результаты и таблица ЧМ в реальном времени на FotMob \u2197', fotmobPanel:'Результаты, таблица и расписание на FotMob \u2197' },
+    uk: { sports:'Спорт', technology:'Технології', national:'Внутрішні новини', international:'Міжнародні', stocks:'Біржа', worldcup:'Чемпіонат світу', all:'Усі', by:'Автор', empty:'У цій категорії поки немає статей.', fotmobMasthead:'Результати та таблиця ЧС наживо на FotMob \u2197', fotmobPanel:'Результати, таблиця та розклад на FotMob \u2197' },
+    tr: { sports:'Spor', technology:'Teknoloji', national:'Yurt İçi', international:'Yurt Dışı', stocks:'Borsa', worldcup:'Dünya Kupası', all:'Tümü', by:'Yazan', empty:'Bu kategoride henüz haber yok.', fotmobMasthead:'FotMob\u2019da canlı Dünya Kupası sonuçları ve puan durumu \u2197', fotmobPanel:'FotMob\u2019da canlı sonuçlar, puan durumu ve fikstür \u2197' },
+    ar: { sports:'رياضة', technology:'تقنية', national:'محلي', international:'دولي', stocks:'أسواق المال', worldcup:'كأس العالم', all:'الكل', by:'بقلم', empty:'لا توجد مقالات في هذا القسم بعد.', fotmobMasthead:'نتائج وجدول كأس العالم مباشرة على FotMob \u2197', fotmobPanel:'النتائج والجدول والمباريات مباشرة على FotMob \u2197' },
+    he: { sports:'ספורט', technology:'טכנולוגיה', national:'פנים', international:'חוץ', stocks:'שוק ההון', worldcup:'מונדיאל', all:'הכול', by:'מאת', empty:'אין עדיין כתבות בקטגוריה זו.', fotmobMasthead:'תוצאות וטבלת המונדיאל בזמן אמת ב-FotMob \u2197', fotmobPanel:'תוצאות, טבלה ולוח משחקים בזמן אמת ב-FotMob \u2197' },
+    hi: { sports:'खेल', technology:'तकनीक', national:'राष्ट्रीय', international:'अंतरराष्ट्रीय', stocks:'शेयर बाज़ार', worldcup:'विश्व कप', all:'सभी', by:'द्वारा', empty:'इस श्रेणी में अभी तक कोई लेख नहीं है।', fotmobMasthead:'FotMob पर लाइव विश्व कप स्कोर और तालिका \u2197', fotmobPanel:'FotMob पर लाइव स्कोर, तालिका और मैच कार्यक्रम \u2197' },
+    th: { sports:'กีฬา', technology:'เทคโนโลยี', national:'ในประเทศ', international:'ต่างประเทศ', stocks:'หุ้น', worldcup:'ฟุตบอลโลก', all:'ทั้งหมด', by:'โดย', empty:'ยังไม่มีข่าวในหมวดนี้', fotmobMasthead:'ผลบอลโลกสดและตารางคะแนนที่ FotMob \u2197', fotmobPanel:'ผลสด ตารางคะแนน และโปรแกรมการแข่งขันที่ FotMob \u2197' },
+    vi: { sports:'Thể thao', technology:'Công nghệ', national:'Trong nước', international:'Quốc tế', stocks:'Chứng khoán', worldcup:'World Cup', all:'Tất cả', by:'Bởi', empty:'Chưa có bài viết nào trong mục này.', fotmobMasthead:'Xem tỷ số và bảng xếp hạng World Cup trực tiếp trên FotMob \u2197', fotmobPanel:'Xem tỷ số, bảng xếp hạng và lịch thi đấu trực tiếp trên FotMob \u2197' },
+    id: { sports:'Olahraga', technology:'Teknologi', national:'Nasional', international:'Internasional', stocks:'Saham', worldcup:'Piala Dunia', all:'Semua', by:'Oleh', empty:'Belum ada berita di kategori ini.', fotmobMasthead:'Skor dan klasemen Piala Dunia langsung di FotMob \u2197', fotmobPanel:'Skor, klasemen, dan jadwal langsung di FotMob \u2197' },
+    ja: { sports:'スポーツ', technology:'テクノロジー', national:'国内', international:'国際', stocks:'株式', worldcup:'ワールドカップ', all:'すべて', by:'記者', empty:'このカテゴリーの記事はまだありません。', fotmobMasthead:'FotMobでワールドカップのライブスコアと順位表を見る \u2197', fotmobPanel:'FotMobでライブスコア・順位表・試合日程を見る \u2197' },
+    ko: { sports:'스포츠', technology:'기술', national:'국내', international:'국제', stocks:'증시', worldcup:'월드컵', all:'전체', by:'작성', empty:'아직 이 카테고리에 기사가 없습니다.', fotmobMasthead:'FotMob에서 월드컵 실시간 스코어 및 순위 보기 \u2197', fotmobPanel:'FotMob에서 실시간 스코어·순위·경기 일정 보기 \u2197' },
+    'zh-CN': { sports:'体育', technology:'科技', national:'国内', international:'国际', stocks:'股市', worldcup:'世界杯', all:'全部', by:'作者', empty:'该分类下暂无新闻。', fotmobMasthead:'在 FotMob 查看世界杯实时比分和积分榜 \u2197', fotmobPanel:'在 FotMob 查看实时比分、积分榜和赛程 \u2197' },
+    'zh-TW': { sports:'體育', technology:'科技', national:'國內', international:'國際', stocks:'股市', worldcup:'世界盃', all:'全部', by:'作者', empty:'該分類下暫無新聞。', fotmobMasthead:'在 FotMob 查看世界盃即時比分與積分榜 \u2197', fotmobPanel:'在 FotMob 查看即時比分、積分榜與賽程 \u2197' },
+  };
+
+  let currentLang = 'en';
+  function t(key){
+    return (I18N[currentLang] && I18N[currentLang][key]) || I18N.en[key] || key;
+  }
+
+  const ARTICLES = [
+    { id:1, cat:'sports', headline:'Ironbridge United Rally Late To Snap Five-Game Losing Skid', teaser:'A 91st-minute header from midfielder Dana Okoye turns a flat afternoon at Kestrel Park into a 2-1 win.',       byline:'M. Alvarez', time:'2h ago', read:'3 min read',
+      body:['Down a goal at the break and short-handed after a first-half injury, the home side looked headed for a fourth straight defeat. Instead, a reshuffled midfield found its rhythm, controlling possession for long stretches of the second half and forcing three corners in the final ten minutes alone.',
+            'The equalizer came from a scrambled set piece, and the winner arrived two minutes into stoppage time off a near-post flick that caught the visiting keeper flat-footed. The result lifts the club off the bottom of the table and hands the new interim coach his first win in charge.',
+            'Postgame, players credited a tactical switch to a back three for stabilizing a defense that had conceded eleven goals across the losing run. Attention now turns to a midweek cup tie against a side two divisions higher.'] },
+    { id:2, cat:'sports', headline:'Cedar Falls Marlins Rookie Tosses Seven Scoreless Innings In Debut', teaser:'Right-hander Miguel Vasquez strikes out nine Redwood Sluggers hitters in a composed first start.',       byline:'D. Chu', time:'5h ago', read:'2 min read',
+      body:['Called up from the minors just four days ago, the 22-year-old right-hander worked around traffic in the third and fifth innings but otherwise carved through the lineup with a fastball that touched the upper nineties and a changeup that drew six swinging strikes.',
+            'The bullpen closed it out cleanly, preserving a shutout that snapped a five-game losing streak for the club. Coaches were quick to temper expectations, noting one start is one start, but the poise on display against a playoff-contending lineup did not go unnoticed in the clubhouse.'] },
+    { id:3, cat:'sports', headline:'Baymouth Marathon Course Record Falls By 90 Seconds', teaser:'Abel Kiptoo breaks the 40-year-old course record with a 2:04:58 finish in cool morning conditions.',       byline:'R. Okafor', time:'1d ago', read:'3 min read',
+      body:['A pack of six lead runners stayed together through the halfway mark before a decisive surge on the long downhill stretch near mile 18 broke the field apart. The eventual winner crossed alone, arms raised, well inside the previous course best.',
+            'Race organizers pointed to overnight temperatures nearly ten degrees cooler than average as a contributing factor, along with a pacing strategy that front-loaded a faster-than-usual opening ten kilometers.',
+            'The women\'s race was similarly fast, with the top three finishers all beating the prior course record, setting up what organizers are already calling next year\'s most competitive field yet.'] },
+    { id:16, cat:'sports', headline:'Hartline Hawks\' Marcus Webb Records Triple-Double In 500th Career Game', teaser:'The ten-year veteran finishes with 14 points, 11 assists, and 10 rebounds in a 108-97 win over the Rockport Rebels.',       byline:'M. Alvarez', time:'40m ago', read:'2 min read',
+      body:['The point guard finished with 14 points, 11 assists, and 10 rebounds, becoming just the fourth player in franchise history to reach a triple-double in his 500th career appearance. He did it while shooting a tidy 6-for-9 from the field, avoiding the volume-shooting stat-padding that sometimes accompanies milestone chases.',
+            'Teammates and coaches pointed instead to his fourth-quarter defense, where he drew two charges and deflected a potential go-ahead pass, as the more meaningful contribution to the win.'] },
+    { id:17, cat:'sports', headline:'Third-Tier Alden Town Stun Ironbridge United On Penalties', teaser:'Alden Town advance to the National Cup semifinal after an 8-7 shootout following 120 scoreless minutes.',       byline:'R. Okafor', time:'3h ago', read:'3 min read',
+      body:['Neither side could break through across regulation and extra time, setting up a shootout that stretched to eight rounds after both teams converted their first five attempts. The lower-division side\'s goalkeeper, a part-time player who works as a delivery driver during the week, saved the decisive kick.',
+            'The result is being called one of the biggest upsets in the competition\'s modern history and guarantees the club its largest single payday in club history from broadcast and gate receipts.'] },
+    { id:18, cat:'sports', headline:'Rebels Forward Elena Cruz Ruled Out Six Weeks With Ankle Injury', teaser:'The league\'s third-leading scorer will miss three divisional games, including two against the Hartline Hawks.',       byline:'D. Chu', time:'6h ago', read:'2 min read',
+      body:['Imaging confirmed a high-ankle sprain sustained in the third quarter of last night\'s win, an injury that typically sidelines players for four to eight weeks. The team says it will lean more heavily on its bench unit, which has outscored opponents in limited minutes this season.',
+            'The absence comes at an awkward time, with three divisional games on the schedule before the player is expected to be reevaluated.'] },
+    { id:19, cat:'sports', headline:'Qualifier Priya Nandakumar Upsets No. 3 Seed At Brightwater Open', teaser:'Ranked 154th, Nandakumar wins 6-4, 6-2 for her first career win over a top-10 opponent.',       byline:'H. Nakamura', time:'9h ago', read:'2 min read',
+      body:['The 22-year-old qualifier broke serve five times en route to a straight-sets win, never facing a break point of her own in the second set. It is her first career win over a top-10 opponent and moves her into the second week of a major for the first time.',
+            'She credited a change in return positioning, standing noticeably further inside the baseline, for neutralizing her opponent\'s heavy first serve.'] },
+    { id:20, cat:'sports', headline:'National Basketball Circuit Adds Two Wild-Card Spots Starting Next Season', teaser:'The 16-team league approves an expanded playoff format and revamped seeding beginning next fall.',       byline:'K. Bennett', time:'1d ago', read:'3 min read',
+      body:['The format change adds two wild-card berths per conference and eliminates automatic byes for division winners, a shift the league says is designed to reward regular-season performance over scheduling luck. Owners approved the change by a wide margin after two years of internal debate.',
+            'Player representatives had pushed for additional off-days to offset the extra postseason games, a request the league partially accommodated by trimming two weeks from next year\'s exhibition schedule.'] },
+    { id:21, cat:'sports', headline:'Ironbridge Academy Product Theo Mensah Named Rookie Of The Year', teaser:'The 20-year-old winger led all first-year players with 14 goals in his debut top-flight season.',       byline:'M. Alvarez', time:'2d ago', read:'2 min read',
+      body:['The 20-year-old, who came through the club\'s academy system rather than a traditional draft path, led all first-year players in scoring and finished second in assists. The award makes him the third academy graduate to win the honor in the past decade.',
+            'He said in accepting the award that the club\'s decision to loan him to a lower-division side two years ago, a move he privately disagreed with at the time, ended up being the most important development step of his career.'] },
+    { id:22, cat:'sports', headline:'Rockport Rebels\' Comeback Falls Short In 121-119 Overtime Thriller', teaser:'Down 17 entering the fourth quarter, the Rebels force overtime before falling to the Hartline Hawks.',       byline:'D. Chu', time:'2d ago', read:'2 min read',
+      body:['Trailing by 17 entering the fourth quarter, the team scored on five straight possessions to force overtime, capped by a buzzer-beating three to send the game to an extra period. A miscommunication on defense in overtime, however, left an opposing shooter open for the winning basket.',
+            'The coach called the effort "the best 12 minutes we\'ve played all year" while acknowledging the same defensive lapses that opened the door for the comeback ultimately decided the extra period.'] },
+
+    { id:4, cat:'technology', headline:'Nimbus Semiconductor Unveils New Coldstream Processor Line', teaser:'The chipmaker\'s 3nm Coldstream chips promise 33% lower power draw for next-gen laptops.',       byline:'S. Patel', time:'1h ago', read:'4 min read',
+      body:['The company says the redesigned chip architecture cuts power draw by roughly a third under typical workloads while maintaining performance parity with the outgoing generation on single-threaded tasks. Much of the gain comes from a restructured cache hierarchy and a manufacturing process shrink.',
+            'Laptop makers are expected to begin shipping devices built on the new chips within the quarter, with early partners emphasizing thinner designs and extended battery life as the primary selling points rather than raw speed.',
+            'Analysts note the announcement lands amid intensifying competition from rivals pursuing similar efficiency-first designs, suggesting the next upgrade cycle may be fought more on battery life than benchmark scores.'] },
+    { id:5, cat:'technology', headline:'Open-Source Database Ferndb Passes 1 Million Production Deployments', teaser:'The decade-old project has quietly become the default database choice for a new generation of startups.',       byline:'J. Lindqvist', time:'6h ago', read:'3 min read',
+      body:['Once considered a niche alternative, the database has spent the past two years steadily displacing established commercial options in new projects, according to developer survey data released this week. Contributors point to a simplified deployment model and permissive licensing as key drivers.',
+            'Several cloud providers have responded by launching managed hosting tiers built specifically around the project, a sign that infrastructure vendors see sustained demand rather than a passing trend.',
+            'The core maintainer team, still largely volunteer-run, says it plans to use a portion of new sponsorship funding to expand paid contributor roles next year.'] },
+    { id:6, cat:'technology', headline:'Regulators Open Inquiry Into Vantage Store\'s 30% Payment Fee', teaser:'The review examines whether Vantage Mobile\'s required in-app payment system unfairly limits smaller developers.',       byline:'A. Reyes', time:'9h ago', read:'3 min read',
+      body:['The inquiry will examine whether mandatory use of a platform\'s own payment system, and the commission attached to it, constitutes anti-competitive behavior under existing digital markets rules. Similar reviews in other jurisdictions have led to rule changes in the past two years.',
+            'Developer groups have long argued the fee structure disproportionately affects smaller studios that lack the negotiating leverage of larger publishers. Platform operators maintain the fees fund security review, hosting, and discovery tools that benefit developers of every size.',
+            'A preliminary finding is expected within six months, though any resulting rule changes would likely face an extended appeals process.'] },
+    { id:23, cat:'technology', headline:'Solstice Cells Claims Solid-State Battery With Double The Energy Density', teaser:'The startup says its new cell chemistry charges to 80% in under 15 minutes, with two automakers already testing it.',       byline:'S. Patel', time:'2h ago', read:'4 min read',
+      body:['The company says its solid-state cell chemistry achieves roughly double the energy density of comparable lithium-ion batteries while charging to 80 percent in under fifteen minutes. Independent testing of the claims has been limited so far, though two automakers have signed early evaluation agreements.',
+            'Manufacturing at scale remains the central challenge; solid-state designs have a long history of working in the lab but struggling with the defect rates and cost that come with mass production.',
+            'The company says a pilot production line is expected to come online next year, with commercial cells targeted for a limited release the year after.'] },
+    { id:24, cat:'technology', headline:'Wavelink Messenger Rolls Out End-To-End Encrypted Cloud Backups', teaser:'The update closes a gap that had left chat backups for Wavelink\'s 2 billion users readable on its own servers.',       byline:'J. Lindqvist', time:'5h ago', read:'2 min read',
+      body:['Previously, message backups stored in the cloud were encrypted in transit but readable by the company on its servers, a gap that stood in contrast to the app\'s end-to-end encrypted messaging itself. The new opt-in feature closes that gap using a key generated and stored solely on the user\'s device.',
+            'Security researchers welcomed the change while noting that users who lose their device and recovery key will have no way to recover old backups, a tradeoff the company says it flags clearly during setup.'] },
+    { id:25, cat:'technology', headline:'Meridian Motors Delays Full Self-Driving Rollout To Next Year', teaser:'The automaker cites unresolved performance gaps in heavy rain and snow, its second delay in two years.',       byline:'A. Reyes', time:'8h ago', read:'3 min read',
+      body:['The delay marks the second postponement of the fully autonomous feature in two years, with the company citing unresolved performance issues in heavy rain and snow. Internal test data reportedly showed a meaningful gap in reliability between clear and adverse weather conditions.',
+            'The company said it would continue limited testing with safety drivers in select cities while it works through the remaining edge cases, but declined to commit to a new firm launch date.'] },
+    { id:26, cat:'technology', headline:'Ashgrove Labs Demonstrates Fanless Chip For Silent Tablets', teaser:'The new packaging technique routes heat through the circuit board, running a demanding workload an hour without throttling.',       byline:'S. Patel', time:'12h ago', read:'3 min read',
+      body:['The technique routes heat away from the processor through specially designed channels in the circuit board rather than relying on a traditional heat sink and fan, according to a paper presented at an industry conference this week. Early prototypes reportedly ran a demanding workload without throttling for over an hour.',
+            'Device makers who reviewed the research say the approach could be most useful in thin tablets and set-top boxes, where fan noise and thickness are persistent design constraints, though commercial products are likely still several years away.'] },
+    { id:27, cat:'technology', headline:'Skyward Booking Platform Outage Disrupts Check-In At 40 Airports', teaser:'A faulty update to the widely used carrier platform caused hours of delays during Friday\'s peak travel window.',       byline:'A. Reyes', time:'1d ago', read:'3 min read',
+      body:['The outage, traced to a faulty update pushed to a booking and check-in platform used by several major carriers, caused delays and manual check-ins at dozens of airports during Friday\'s peak travel window. Most systems were restored within four hours, though a backlog of delayed flights persisted into the evening.',
+            'The vendor said it has rolled back the update and is auditing its testing process, while airlines affected are offering rebooking waivers for passengers who missed connections during the outage.'] },
+    { id:28, cat:'technology', headline:'Cobalt Code Assistant Adds Support For COBOL And Legacy Systems', teaser:'The update targets banks and insurers still running decades-old code few current developers can maintain.',       byline:'J. Lindqvist', time:'1d ago', read:'2 min read',
+      body:['The expanded language support targets industries such as banking and insurance, where core systems still run on decades-old code that few current developers are trained to maintain. Early testers say the tool has been most useful for explaining undocumented logic rather than writing new code outright.',
+            'Analysts see the move as part of a broader push by AI tool makers into enterprise maintenance work, a less glamorous but potentially larger market than greenfield software development.'] },
+    { id:29, cat:'technology', headline:'Pulseband Adds Cuffless Blood Pressure Estimates To Series 5 Watch', teaser:'The feature uses pulse transit time but still needs monthly calibration against a traditional cuff.',       byline:'S. Patel', time:'2d ago', read:'2 min read',
+      body:['The new sensor estimates blood pressure using pulse transit time measurements rather than a traditional inflatable cuff, though users will still need to calibrate the device against a cuff-based reading roughly once a month to maintain accuracy. Regulators cleared the feature for general wellness use but not for diagnostic purposes.',
+            'Cardiologists interviewed about the technology were cautiously optimistic, noting that trend data over time may prove more clinically useful than any single cuffless reading.'] },
+
+    { id:7, cat:'national', headline:'$42 Billion Ashford Infrastructure Bill Clears Committee After Late Amendments', teaser:'A late round of negotiations adds rural broadband funding in exchange for narrower eligibility on transit grants.',       byline:'K. Bennett', time:'3h ago', read:'4 min read',
+      body:['The revised bill now heads to a full floor vote after clearing committee on a bipartisan vote late yesterday. Negotiators added a dedicated rural broadband fund following pressure from lawmakers representing less densely populated districts, while tightening eligibility requirements for transit modernization grants sought by several large metro areas.',
+            'Supporters say the compromise version has a stronger chance of passage than the original draft, which stalled twice over disagreements about how funds would be distributed between urban and rural districts.',
+            'A floor vote is expected before the current session ends, though several amendments are still likely to be offered on the chamber floor.'] },
+    { id:8, cat:'national', headline:'Millbrook\'s $310 Million Teacher Pay Plan Advances To Governor\'s Desk', teaser:'The three-year plan ties raises to years of service and rural placement, addressing a staffing gap outside major cities.',       byline:'L. Marsh', time:'8h ago', read:'3 min read',
+      body:['The plan phases in salary increases over three years, with the largest bumps reserved for teachers in districts that have struggled most to fill open positions. Sponsors say the structure is meant to address a staffing shortfall that has left some rural districts relying heavily on long-term substitutes.',
+            'The measure passed with support from both major parties after an earlier, more expensive version was scaled back during budget negotiations. The governor has signaled she intends to sign it before the new school year begins.'] },
+    { id:9, cat:'national', headline:'Drought Emergency Declared Across Ashwood, Kestrel, And Millbrook Counties', teaser:'Reservoir levels have fallen to their lowest point in over a decade, prompting mandatory water-use restrictions.',       byline:'T. Osei', time:'12h ago', read:'2 min read',
+      body:['The declaration triggers mandatory restrictions on outdoor water use and unlocks emergency state funding for affected municipalities. Local officials say reservoir levels have dropped to their lowest point since record-keeping began in the region.',
+            'Agricultural groups have asked for expedited access to relief funds, warning that continued dry conditions could force significant crop losses before the next scheduled rainfall window.'] },
+    { id:30, cat:'national', headline:'Federal Workplace Safety Board Proposes New Warehouse Heat Rules', teaser:'The rule would require rest breaks and cooling areas once indoor temperatures pass 90 degrees Fahrenheit.',       byline:'T. Osei', time:'1h ago', read:'3 min read',
+      body:['The proposed rule would require employers to provide paid rest breaks, accessible cooling areas, and acclimatization periods for new workers once indoor temperatures exceed a specified threshold. It follows a multi-year review prompted by a rise in heat-related workplace injury claims.',
+            'Industry groups have asked for a longer compliance window, citing the cost of retrofitting older facilities, while worker advocacy groups say the threshold proposed is still too high to protect workers during summer heat waves.',
+            'A public comment period is now open, with a final rule not expected before next year.'] },
+    { id:31, cat:'national', headline:'Millbrook City Council Approves Zoning Overhaul To Speed Housing Construction', teaser:'The changes allow duplexes and small apartment buildings in neighborhoods previously zoned single-family only.',       byline:'L. Marsh', time:'4h ago', read:'3 min read',
+      body:['The zoning overhaul, passed after a contentious series of public hearings, allows duplexes and small multifamily buildings in neighborhoods previously restricted to single-family homes. Supporters say the change is a necessary response to a worsening housing shortage; opponents raised concerns about parking and neighborhood character.',
+            'City planners estimate the change could add several thousand new housing units over the next decade, though the actual pace will depend heavily on construction costs and interest rates.'] },
+    { id:32, cat:'national', headline:'Cedar Hollow National Park Visitation Hits Record 4.8 Million For Third Straight Year', teaser:'Officials credit a post-pandemic shift toward outdoor recreation, but warn of strain on aging trails and parking.',       byline:'K. Bennett', time:'7h ago', read:'2 min read',
+      body:['Visitation across the national park system set a record for the third consecutive year, a trend officials attribute to a lasting post-pandemic shift toward outdoor recreation. Several of the most popular parks have introduced timed-entry reservation systems to manage crowding during peak season.',
+            'Park officials say aging infrastructure, including trails, restrooms, and parking capacity, has not kept pace with the visitor growth, and are pressing Congress for a dedicated maintenance funding increase.'] },
+    { id:33, cat:'national', headline:'Supreme Court Agrees To Hear Case On Crestline Retail\'s Scheduling Algorithm', teaser:'The case could decide whether Crestline\'s automated shift-scheduling software must give workers advance notice of changes.',       byline:'T. Osei', time:'10h ago', read:'3 min read',
+      body:['The case centers on whether software that automatically adjusts employee shift schedules based on real-time demand forecasts must still comply with state laws requiring advance notice of schedule changes. A ruling against the scheduling software could force widespread changes to how large retail and food service chains staff their stores.',
+            'Labor groups have framed the case as a test of whether existing worker protections keep pace with automated management tools; business groups argue the flexibility the software provides benefits both employers and, in many cases, workers seeking more hours.'] },
+    { id:34, cat:'national', headline:'Wildfire Season Off To Earliest Start On Record Across Ashwood And Kestrel Counties', teaser:'A dry winter combined with early heat has fire officials bracing for a longer and more intense season.',       byline:'L. Marsh', time:'14h ago', read:'2 min read',
+      body:['Fire officials confirmed the earliest start to wildfire season on record across several western states, following one of the driest winters in over a decade and an early-season heat wave. Additional seasonal firefighting crews have already been deployed a full month ahead of the typical schedule.',
+            'State emergency management officials are urging residents in high-risk areas to prepare evacuation plans early, noting that resources could be stretched thin if multiple large fires ignite simultaneously.'] },
+    { id:35, cat:'national', headline:'Census Report Shows Millbrook Suburbs Growing Four Times Faster Than Downtown', teaser:'New data shows suburban and exurban counties growing faster than core urban centers for a fourth straight year.',       byline:'K. Bennett', time:'1d ago', read:'2 min read',
+      body:['The report shows suburban and exurban counties growing faster than core urban centers for a fourth consecutive year, continuing a trend that accelerated during the pandemic and has persisted even as many employers have called workers back to offices.',
+            'Demographers caution against reading the shift as a permanent verdict on urban decline, noting that several large cities have seen growth resume in the past 18 months, driven largely by international migration.'] },
+    { id:36, cat:'national', headline:'Bipartisan Group Unveils Plan To Extend Retirement Fund Solvency By 20 Years', teaser:'The proposal combines a gradual payroll tax increase with adjustments to the benefit formula for higher earners.',       byline:'K. Bennett', time:'2d ago', read:'4 min read',
+      body:['The proposal pairs a phased-in increase to the payroll tax cap with adjustments to the benefit formula that would modestly reduce future payouts for higher earners, while leaving benefits for lower and middle-income retirees largely untouched. Sponsors say the combination would extend the trust fund\'s solvency by roughly two decades.',
+            'Similar bipartisan proposals have stalled in past sessions amid disagreement over how much of the burden should fall on tax increases versus benefit adjustments, and this version is expected to face the same headwinds.'] },
+
+    { id:10, cat:'international', headline:'Larenthia And Osterby Resume Trade Talks After Six-Month Pause', teaser:'Both delegations signal cautious optimism as tariff negotiations reopen ahead of a year-end deadline.',       byline:'H. Nakamura', time:'4h ago', read:'4 min read',
+      body:['Negotiators from both sides described the opening session as constructive, though neither delegation offered specifics on the sticking points that stalled talks earlier this year. A joint statement pointed to agricultural tariffs and digital trade rules as the two areas requiring the most work.',
+            'Business groups on both sides have pushed for a resolution before a year-end deadline, after which existing tariff exemptions are set to expire automatically.',
+            'A follow-up round is scheduled for next month, with officials suggesting a framework agreement, if reached, would still require months of technical drafting before formal signing.'] },
+    { id:11, cat:'international', headline:'Port Calduna Completes $2.1 Billion Flood Barrier Project', teaser:'The decade-long engineering effort aims to protect low-lying neighborhoods from increasingly frequent storm surges.',       byline:'F. Duarte', time:'10h ago', read:'3 min read',
+      body:['The barrier system, completed after eleven years of construction, is designed to hold back storm surges that have grown more frequent over the past two decades. Engineers say the system can be sealed within minutes using an automated warning trigger tied to tide and wind-speed sensors.',
+            'Officials from several other coastal cities have visited the site in recent months, weighing similar projects as sea levels and storm intensity continue to raise flood risk in low-lying urban areas worldwide.'] },
+    { id:12, cat:'international', headline:'Verrado Trade Bloc Agrees To Joint Energy Grid Framework', teaser:'Twelve member states sign a preliminary agreement to link power grids and share renewable capacity across borders.',       byline:'E. Kovac', time:'1d ago', read:'3 min read',
+      body:['The framework, years in negotiation, would allow member states to share excess renewable generation across borders during peak demand periods, reducing reliance on fossil fuel backup capacity. Full implementation is expected to take most of the next decade and require significant new transmission infrastructure.',
+            'Energy ministers described the agreement as a foundational step rather than a finished plan, with technical committees now tasked with resolving pricing and grid-access disputes between member states.'] },
+    { id:37, cat:'international', headline:'Bank Of Osterby Holds Rates Steady At 4.25%, Signals Cuts May Be Near', teaser:'Policymakers point to cooling inflation and softening labor data as reasons for a more cautious stance.',       byline:'E. Kovac', time:'2h ago', read:'3 min read',
+      body:['The central bank left its benchmark rate unchanged for a fourth consecutive meeting but softened its language on future policy, citing cooling inflation and early signs of a softening labor market. Markets interpreted the shift as an indication that a first rate cut could come within the next two meetings.',
+            'The bank\'s governor cautioned against reading too much into the timing, stressing that any cut would remain data-dependent and could be delayed if inflation data in the coming months surprises to the upside.'] },
+    { id:38, cat:'international', headline:'Shipping Delays Ease As Tarnovia Canal Traffic Returns To Normal', teaser:'A months-long bottleneck caused by low water levels has finally cleared after seasonal rains replenished reservoirs.',       byline:'F. Duarte', time:'6h ago', read:'2 min read',
+      body:['Transit restrictions imposed after a months-long drought lowered water levels along a key shipping canal have been fully lifted following a wetter-than-usual rainy season. Daily transit slots are back to pre-drought levels for the first time in over a year.',
+            'Shipping analysts say the backlog of delayed vessels should clear within a few weeks, though freight rates on affected routes remain elevated as carriers work through rescheduled cargo.'] },
+    { id:39, cat:'international', headline:'Meskin Election Results Point To Four-Party Coalition After Fragmented Vote', teaser:'No single party secured a majority, setting up weeks of negotiation among four potential coalition partners.',       byline:'E. Kovac', time:'11h ago', read:'3 min read',
+      body:['With no party securing an outright majority, the country now faces what analysts expect to be several weeks of coalition negotiations among four parties with notably different platforms on tax and immigration policy. The last comparably fragmented result took nearly two months to resolve into a governing coalition.',
+            'Financial markets showed only a muted reaction to the results, with analysts noting investors had largely priced in the likelihood of a fragmented outcome ahead of the vote.'] },
+    { id:40, cat:'international', headline:'Archaeologists Uncover 2,500-Year-Old Settlement Beneath Valdoria Farmland', teaser:'Ground-penetrating radar reveals a network of structures far larger than any previously known site in the region.',       byline:'F. Duarte', time:'16h ago', read:'3 min read',
+      body:['Ground-penetrating radar surveys revealed a network of structures spanning several square kilometers beneath farmland, making it by far the largest settlement of its kind identified in the region to date. Researchers estimate the site dates back roughly 2,500 years based on surface pottery fragments.',
+            'A full excavation is expected to take years and will require coordination with local farmers, whose land sits directly above much of the newly identified settlement.'] },
+    { id:41, cat:'international', headline:'Larenthia And Valdoria Sign Long-Delayed Border Water-Sharing Agreement', teaser:'The deal ends a decade of disputes over river access that had periodically strained diplomatic relations.',       byline:'H. Nakamura', time:'1d ago', read:'3 min read',
+      body:['The agreement establishes a fixed formula for sharing river water during dry years, ending a decade of disputes that had periodically strained diplomatic relations between the two countries. Both governments described the signing as a model for resolving similar disputes elsewhere in the region.',
+            'Farmers on both sides of the border, who have borne the brunt of the uncertainty in past dry years, offered a cautiously positive reaction, saying implementation over the next several irrigation seasons will be the real test.'] },
+    { id:42, cat:'international', headline:'Global Shipping Industry Agrees To Binding Emissions Targets By 2040', teaser:'The agreement marks the first legally binding climate framework covering international maritime transport.',       byline:'E. Kovac', time:'1d ago', read:'4 min read',
+      body:['The agreement sets binding targets to cut greenhouse gas emissions from international shipping by specified benchmarks over the next two decades, funded in part by a new levy on vessel emissions. It marks the first legally binding global climate framework specific to maritime transport.',
+            'Shipping industry groups broadly welcomed the certainty the agreement provides for long-term fleet investment decisions, though some smaller operators warned the levy could disproportionately burden shorter regional routes with thinner margins.'] },
+    { id:43, cat:'international', headline:'Larenthia-Osterby High-Speed Rail Link Begins Construction After Years Of Delay', teaser:'The line aims to cut travel time between the two capitals from seven hours to under three.',       byline:'F. Duarte', time:'2d ago', read:'3 min read',
+      body:['Construction officially began this week on a high-speed rail line intended to cut travel time between the two capitals from roughly seven hours to under three, after years of delays tied to financing disputes and environmental review. The project is being jointly funded by both governments along with a regional development bank.',
+            'Officials expect the first phase to open within six years, though similar cross-border infrastructure projects in the region have a mixed track record of meeting initial timelines.'] },
+
+    { id:13, cat:'stocks', headline:'Markets Close Up 1.8% As Inflation Data Cools To 2.6%', teaser:'Major indices post their best week in two months after consumer price growth comes in below forecasts.',       byline:'N. Whitfield', time:'30m ago', read:'3 min read',
+      body:['All three major indices finished the session higher, extending a rally that began after this week\'s consumer price data showed inflation cooling faster than economists had forecast. Rate-sensitive sectors, including real estate and small-cap growth stocks, led the advance.',
+            'Bond yields eased alongside the equity rally, with traders increasing bets that policymakers may hold off on further rate increases in the coming months.',
+            'Trading volume was above the recent average, suggesting the move reflected broad repositioning rather than a narrow, low-conviction rally.'] },
+    { id:14, cat:'stocks', headline:'Crestline Retail Shares Slide 8% On Soft Holiday Guidance', teaser:'A cautious sales outlook overshadows a solid quarterly earnings beat, sending shares down in after-hours trading.',       byline:'C. Bianchi', time:'2h ago', read:'2 min read',
+      body:['Shares fell as much as eight percent in after-hours trading after the company issued holiday-quarter guidance below analyst expectations, even as it beat on both revenue and earnings for the quarter just reported. Executives cited softer discretionary spending among lower-income shoppers.',
+            'The company also announced a modest cost-cutting plan focused on store operations, which it says should partially offset margin pressure from ongoing promotional discounting.'] },
+    { id:15, cat:'stocks', headline:'Nimbus Semiconductor Shares Jump 6% On Upgraded Demand Forecast', teaser:'The chipmaker raises its full-year outlook, citing stronger-than-expected orders tied to data center expansion.',       byline:'N. Whitfield', time:'7h ago', read:'2 min read',
+      body:['The company raised its full-year revenue forecast for the second time this year, pointing to sustained demand from data center customers building out additional computing capacity. Shares rose sharply in premarket trading following the announcement.',
+            'Several analysts raised price targets on the stock following the update, though a few flagged valuation concerns given how much of the sector\'s expected growth already appears priced in.'] },
+    { id:44, cat:'stocks', headline:'Ashgrove Airlines Climbs 4% As Fuel Costs Fall To Two-Year Low', teaser:'Falling crude prices give carriers room to expand margins heading into the busy summer travel season.',       byline:'C. Bianchi', time:'1h ago', read:'2 min read',
+      body:['Shares of major carriers rose across the board after crude oil prices dropped to their lowest level in two years, easing one of the industry\'s largest cost pressures heading into the peak summer travel season. Fuel typically accounts for a fifth to a quarter of airline operating expenses.',
+            'Analysts cautioned that fare competition remains intense, meaning lower fuel costs may translate more into market-share battles than into meaningfully higher profit margins.'] },
+    { id:45, cat:'stocks', headline:'Northstar Biotech Shares Soar 62% On Positive Late-Stage Trial Results', teaser:'The closely watched drug candidate clears its final trial hurdle, setting up a regulatory filing later this year.',       byline:'N. Whitfield', time:'3h ago', read:'3 min read',
+      body:['Shares more than doubled after the company reported that its lead drug candidate met its primary endpoint in a late-stage trial, clearing the final major hurdle before a regulatory filing expected later this year. The drug targets a chronic condition with limited existing treatment options.',
+            'Analysts noted the trial\'s safety profile was as important to the stock reaction as its efficacy data, since a handful of competing drugs in the same class have stumbled over side-effect concerns in recent years.'] },
+    { id:46, cat:'stocks', headline:'Reserve Board Minutes Show Growing 5-4 Split Over Next Rate Move', teaser:'Meeting notes reveal a more divided committee than markets had expected heading into the next decision.',       byline:'C. Bianchi', time:'5h ago', read:'3 min read',
+      body:['Minutes from the latest policy meeting revealed a more divided committee than markets had anticipated, with several members favoring an immediate rate adjustment while others preferred to wait for additional inflation data. Bond yields moved higher following the release as traders trimmed bets on a near-term rate cut.',
+            'The split introduces additional uncertainty ahead of the next scheduled meeting, with futures markets now pricing in a wider range of possible outcomes than they had just a week ago.'] },
+    { id:47, cat:'stocks', headline:'Baymark Homes Slips 3% As Mortgage Rates Tick Back Above 7%', teaser:'A modest rise in borrowing costs is enough to cool a sector that had rallied on rate-cut hopes earlier this year.',       byline:'N. Whitfield', time:'8h ago', read:'2 min read',
+      body:['Homebuilder shares fell across the board after average mortgage rates ticked back above a closely watched threshold, denting hopes for a near-term rebound in buyer demand. The sector had rallied sharply earlier in the year on expectations that rates would continue falling.',
+            'Builders themselves have leaned on price cuts and mortgage-rate buydowns to keep sales moving, a strategy that has supported unit volumes but weighed on profit margins over the past several quarters.'] },
+    { id:48, cat:'stocks', headline:'Wavelink Streaming Adds 4.2 Million Subscribers But Warns On Ad Revenue', teaser:'A stronger-than-expected content slate drove signups, but advertisers pulled back spending more than forecast.',       byline:'C. Bianchi', time:'12h ago', read:'2 min read',
+      body:['The company added subscribers well above analyst estimates, crediting a strong slate of original content, but shares fell after executives flagged softer-than-expected advertising revenue on its ad-supported tier. Management attributed the softness to broader caution among brand advertisers rather than any platform-specific issue.',
+            'The mixed report highlights a tension increasingly common across the sector: subscriber growth alone is no longer enough to satisfy investors focused on the profitability of ad-supported tiers.'] },
+    { id:49, cat:'stocks', headline:'Crestpoint Industries Announces Plan To Split Into Three Companies', teaser:'The breakup aims to let investors value the firm\'s aerospace, healthcare, and energy units separately.',       byline:'N. Whitfield', time:'1d ago', read:'3 min read',
+      body:['The company said it will separate into three independently traded companies focused on aerospace, healthcare equipment, and energy infrastructure, a move executives said would let investors value each business on its own merits rather than at a conglomerate discount. The full separation is expected to take up to two years to complete.',
+            'Activist investors had pushed for a breakup for several years, arguing the combined structure obscured strong performance in the aerospace unit relative to slower growth elsewhere in the portfolio.'] },
+    { id:50, cat:'stocks', headline:'Small-Cap Index Up 7.4%, Outpaces Blue Chips For Second Straight Month', teaser:'Falling borrowing costs and a weaker dollar give smaller, domestically focused companies a rare stretch of outperformance.',       byline:'C. Bianchi', time:'2d ago', read:'2 min read',
+      body:['The small-cap index outperformed its large-cap counterpart for a second consecutive month, a reversal after years of underperformance driven largely by a handful of mega-cap technology stocks. Falling borrowing costs and a weaker dollar have disproportionately benefited smaller, more domestically focused companies.',
+            'Strategists were split on whether the rotation marks a durable shift or a temporary pause, noting similar small-cap rallies in past cycles have often faded within a few months.'] },
+
+    { id:51, cat:'worldcup', headline:'France Beat Morocco 2-0 To Reach World Cup Semifinal', teaser:'Kylian Mbappé set up the opener and added a late strike as Les Bleus advanced to face the Spain-Belgium winner in Dallas.',
+      byline:'Wire Services', time:'10h ago', read:'3 min read',
+      body:['Mbappé missed a first-half penalty but made up for it by setting up Ousmane Dembélé\'s opening goal shortly after the hour mark, then added a second himself before full time as France closed out a 2-0 quarterfinal win.',
+            'The result sends France to a semifinal in Dallas on July 14 against the winner of Friday\'s Spain-Belgium quarterfinal, and keeps alive their bid for a third straight World Cup final appearance.',
+            'It is the second consecutive tournament in which France have eliminated Morocco at the World Cup, and Morocco\'s coach struck a defiant tone afterward about the program\'s trajectory heading into 2030.'] },
+    { id:52, cat:'worldcup', headline:'Host Nations U.S., Canada And Mexico All Eliminated Before Quarterfinals', teaser:'Belgium ousted the USMNT, England knocked out Mexico, and Morocco ended Canada\'s run, leaving no co-host team in the final eight.',
+      byline:'Wire Services', time:'1d ago', read:'3 min read',
+      body:['Belgium\'s 4-1 win over the United States in the round of 16 completed a difficult tournament for the three co-hosts, following England\'s 3-2 win over Mexico and Morocco\'s 3-0 victory over Canada.',
+            'It marks a rare instance of every host nation missing the quarterfinal stage of a World Cup, prompting renewed debate in all three countries about each federation\'s development pipeline heading into the next cycle.'] },
+    { id:53, cat:'worldcup', headline:'Erling Haaland Ends Brazil\'s Run As Norway Reach First-Ever Quarterfinal', teaser:'A 2-1 win over the five-time champions sends Norway into the last eight for the first time in the nation\'s history.',
+      byline:'Wire Services', time:'1d ago', read:'2 min read',
+      body:['Haaland\'s performance was central to Norway\'s 2-1 upset of five-time champion Brazil in the round of 16, sending the Scandinavian side to its first-ever World Cup quarterfinal.',
+            'Norway now faces England on July 11 in Miami, with the winner advancing to a semifinal against either Argentina or Switzerland.'] },
+    { id:54, cat:'worldcup', headline:'Messi Leads Argentina Past Egypt 3-2 In Round Of 16 Thriller', teaser:'A back-and-forth knockout match, decided late and reviewed twice by VAR, sends the defending champions through to face Switzerland.',
+      byline:'Wire Services', time:'2d ago', read:'2 min read',
+      body:['Argentina needed a late goal to see off Egypt 3-2 in a round-of-16 match that included two VAR reviews, extending the defending champions\' bid for a second consecutive title.',
+            'The result sets up a quarterfinal against Switzerland, who eliminated Colombia on penalties after a scoreless draw, in Kansas City on July 11.'] },
+    { id:55, cat:'worldcup', headline:'Switzerland Eliminate Colombia On Penalties To Reach Quarterfinals', teaser:'Neither side scored in 120 minutes before Switzerland converted four of five spot kicks to advance.',
+      byline:'Wire Services', time:'2d ago', read:'2 min read',
+      body:['The two sides played out a scoreless draw through extra time before Switzerland prevailed 4-3 in a penalty shootout, continuing a strong tournament for European sides in the knockout rounds.',
+            'Switzerland will meet Argentina in the quarterfinals on July 11 in Kansas City.'] },
+    { id:56, cat:'worldcup', headline:'Spain Edge Portugal 1-0, End Ronaldo\'s Final World Cup Bid', teaser:'A tense round-of-16 win moves Spain into a quarterfinal against Belgium, while Portugal\'s veteran forward exits international soccer.',
+      byline:'Wire Services', time:'3d ago', read:'3 min read',
+      body:['Spain\'s narrow win over Portugal advanced them to a quarterfinal meeting with Belgium in Inglewood on July 10, while marking the end of Cristiano Ronaldo\'s involvement in the tournament.',
+            'Spain have looked among the tournament\'s most balanced sides through the knockout rounds, conceding just once across their last three matches.'] },
+    { id:57, cat:'worldcup', headline:'Golden Boot Race Tightens Heading Into World Cup Quarterfinals', teaser:'Several strikers remain within a goal or two of the lead as the tournament enters its final two weeks.',
+      byline:'Wire Services', time:'4d ago', read:'2 min read',
+      body:['With the field down to eight teams, the race for the tournament\'s top scorer award has tightened considerably, with several forwards from both Europe and South America separated by only a goal or two.',
+            'The Golden Boot has often been decided in the final few matches of past tournaments, and this year\'s expanded 48-team format has added an unusually large number of knockout games in which contenders can add to their totals.'] },
+    { id:58, cat:'worldcup', headline:'World Cup Final Set For July 19 At MetLife Stadium', teaser:'The last match of the expanded 48-team tournament will be played in East Rutherford, New Jersey, capping five weeks of competition across three host countries.',
+      byline:'Wire Services', time:'5d ago', read:'2 min read',
+      body:['Sunday, July 19 is set as the date for the World Cup final at MetLife Stadium in East Rutherford, New Jersey, the same venue that hosted several group-stage and knockout matches earlier in the tournament.',
+            'The final caps a five-week competition that began June 11 in Mexico City and expanded to 48 teams for the first time, with matches played across 16 stadiums in the United States, Mexico, and Canada.'] },
+  ];
+
+  const VISIBLE_ARTICLES = ARTICLES.filter(a => a.cat !== 'worldcup');
+
+  const TICKER_ITEMS = [
+    {sym:'AAPL', price:214.32, dir:'up'}, {sym:'TSLA', price:187.05, dir:'down'},
+    {sym:'NVDA', price:928.41, dir:'up'}, {sym:'MSFT', price:441.10, dir:'up'},
+    {sym:'AMZN', price:186.72, dir:'down'}, {sym:'GOOGL', price:172.88, dir:'up'},
+    {sym:'META', price:512.63, dir:'down'}, {sym:'JPM', price:201.44, dir:'up'},
+  ];
+
+  let activeCategory = 'all';
+  let activeTheme = 'broadsheet';
+
+  function fmtChange(dir){
+    const pct = (Math.random()*2 + 0.1).toFixed(2);
+    return dir === 'up' ? `+${pct}%` : `-${pct}%`;
+  }
+
+  function renderTicker(){
+    const track = document.getElementById('tickerTrack');
+    const items = [...TICKER_ITEMS, ...TICKER_ITEMS]; // loop
+    track.innerHTML = items.map(t => `
+      <span class="tick ${t.dir}">
+        <b>${t.sym}</b> ${t.price.toFixed(2)} ${t.dir === 'up' ? '&#9650;' : '&#9660;'} ${fmtChange(t.dir)}
+      </span>`).join('');
+  }
+
+  function renderTabs(){
+    const tabs = document.getElementById('tabs');
+    const all = [{id:'all'}, ...CATEGORIES];
+    tabs.innerHTML = all.map(c => {
+      const count = c.id === 'all' ? VISIBLE_ARTICLES.length : VISIBLE_ARTICLES.filter(a => a.cat === c.id).length;
+      return `<button class="tab ${activeCategory === c.id ? 'active' : ''}" data-cat="${c.id}">${t(c.id)}<span class="count">${count}</span></button>`;
+    }).join('');
+    tabs.querySelectorAll('.tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeCategory = btn.dataset.cat;
+        renderTabs();
+        renderGrid();
+      });
+    });
+  }
+
+  function renderGrid(){
+    const grid = document.getElementById('grid');
+    const list = activeCategory === 'all' ? VISIBLE_ARTICLES : VISIBLE_ARTICLES.filter(a => a.cat === activeCategory);
+    if(!list.length){
+      grid.innerHTML = `<div class="empty">${t('empty')}</div>`;
+      return;
+    }
+    grid.innerHTML = list.map(a => {
+      const catLabel = t(a.cat);
+      return `
+      <article class="card" data-id="${a.id}">
+        <div class="card-top">
+          <span class="cat-chip" style="background:var(--cat-${a.cat})">${catLabel}</span>
+          <span class="card-time">${a.time}</span>
+        </div>
+        <h3>${a.headline}</h3>
+        <p>${a.teaser}</p>
+        <div class="card-byline">${t('by')} ${a.byline} &middot; ${a.read}</div>
+      </article>`;
+    }).join('');
+    grid.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('click', () => openPanel(parseInt(card.dataset.id)));
+    });
+  }
+
+  function openPanel(id){
+    const a = VISIBLE_ARTICLES.find(x => x.id === id);
+    if(!a) return;
+    const catLabel = t(a.cat);
+    document.getElementById('panelChip').textContent = catLabel;
+    document.getElementById('panelChip').style.background = `var(--cat-${a.cat})`;
+    document.getElementById('panelTitle').textContent = a.headline;
+    document.getElementById('panelByline').textContent = `${t('by')} ${a.byline}`;
+    document.getElementById('panelTime').textContent = a.time;
+    document.getElementById('panelRead').textContent = a.read;
+    document.getElementById('panelText').innerHTML = a.body.map((p,i) =>
+      `<p class="${i===0 ? 'lede':''}">${p}</p>`).join('');
+    const panelLink = document.getElementById('panelLink');
+    panelLink.style.display = 'none';
+    document.getElementById('panel').classList.add('open');
+    document.getElementById('scrim').classList.add('open');
+  }
+
+  function closePanel(){
+    document.getElementById('panel').classList.remove('open');
+    document.getElementById('scrim').classList.remove('open');
+  }
+
+  function updateDate(){
+    const meta = LANG_META[currentLang];
+    try{
+      document.getElementById('todayDate').textContent = new Date().toLocaleDateString(meta.locale, {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      });
+    }catch(e){
+      document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-US', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      });
+    }
+  }
+
+  function applyLanguage(lang){
+    currentLang = LANG_META[lang] ? lang : 'en';
+    const meta = LANG_META[currentLang];
+    document.documentElement.lang = currentLang;
+    document.documentElement.dir = meta.rtl ? 'rtl' : 'ltr';
+    document.getElementById('mastheadTagline').textContent = CATEGORIES.map(c => t(c.id)).join(' \u00B7 ');
+    updateDate();
+    renderTabs();
+    renderGrid();
+    if(document.getElementById('panel').classList.contains('open')){
+      closePanel();
+    }
+  }
+
+  function populateLangSelect(){
+    const sel = document.getElementById('langSelect');
+    sel.innerHTML = Object.keys(LANG_META).map(code =>
+      `<option value="${code}" ${code === currentLang ? 'selected' : ''}>${LANG_META[code].native}</option>`
+    ).join('');
+    sel.addEventListener('change', () => applyLanguage(sel.value));
+  }
+
+  function setTheme(theme){
+    activeTheme = theme;
+    document.documentElement.setAttribute('data-theme', theme);
+    document.querySelectorAll('.theme-swatch').forEach(s => {
+      s.classList.toggle('active', s.dataset.theme === theme);
+    });
+  }
+
+  document.getElementById('panelClose').addEventListener('click', closePanel);
+  document.getElementById('scrim').addEventListener('click', closePanel);
+  document.addEventListener('keydown', e => { if(e.key === 'Escape') closePanel(); });
+
+  document.getElementById('themePicker').querySelectorAll('.theme-swatch').forEach(sw => {
+    sw.addEventListener('click', () => setTheme(sw.dataset.theme));
+  });
+
+  setTheme(activeTheme);
+  populateLangSelect();
+  renderTicker();
+  applyLanguage(currentLang);
+
+  // Refresh dashboard content every 30 seconds.
+  setInterval(() => {
+    updateDate();
+    renderTicker();
+    renderTabs();
+    renderGrid();
+  }, 30000);
+</script>
+</body>
+</html>
